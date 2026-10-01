@@ -1,0 +1,44 @@
+# ════════════ ДЗЕН МАШИНА v1 — Sauna-Wood ════════════
+
+channel:
+  title: "Sauna-Wood: сауны, хамамы, SPA в доме"
+  company: "Sauna-Wood"
+  description: "Как спроектировать и построить сауну, хамам и SPA-зону в загородном доме без переделок. Для владельцев домов и тех, кто строится."
+  language: ru
+  base_url: "https://USERNAME.github.io/dzen-machine"       # или домен сайта компании
+  default_cover: "https://USERNAME.github.io/dzen-machine/static/cover.jpg"
+  # Куда вести читателя из статьи (UTM добавится автоматически). Пусто — без ссылки.
+  cta_url: ""
+
+models:
+  default: "claude-sonnet-5-5"     # бриф, текст, правки, редактор
+  critic: "claude-opus-5-5"        # критик-эксперт: сильнее модель — лучше проверка
+  max_tokens: 12000
+
+# ── Отбор тем ────────────────────────────────────
+topics:
+  min_score: 70                    # ниже — в работу не идёт
+  # веса шкалы 0–100 (сумма = 100)
+  weights: {demand: 20, growth: 15, relevance: 20, commercial: 20, competition: 10, expertise: 10, novelty: 5}
+
+# ── Производство ─────────────────────────────────
+generation:
+  per_run: 1                       # статей за запуск
+  max_revisions: 2                 # кругов «критик → доработка»
+  length: "6000–9000 знаков"
+
+# ── Модерация и выдача ───────────────────────────
+moderation: telegram               # telegram | manual
+schedule:
+  timezone: "Europe/Moscow"
+  times: ["10:00"]                 # слоты публикации; для старта хватит одного в день
+
+feed:
+  size: 50
+  publish_mode: draft              # draft — черновик в Студии, публикуете кнопкой сами
+  categories: ["format-article", "index", "comment-all"]
+
+# ── Аналитика ────────────────────────────────────
+analytics:
+  checkpoints: [1, 3, 7, 30]       # через сколько дней снимать статистику
+  learn_min_posts: 5               # минимум статей с данными за 7 дней для выводов

@@ -1,0 +1,4 @@
+anthropic>=0.40
+markdown>=3.5
+pyyaml>=6.0
+pillow>=10.0
