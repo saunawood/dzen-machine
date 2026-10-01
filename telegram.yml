@@ -1,0 +1,28 @@
+# Каждые 30 минут днём: принять нажатия кнопок и комментарии, разослать новые черновики
+name: Telegram sync
+on:
+  schedule:
+    - cron: "*/30 5-19 * * *"     # каждые 30 мин с 08:00 до 22:30 МСК
+  workflow_dispatch:
+permissions: { contents: write }
+concurrency: { group: repo-writer, cancel-in-progress: false }
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -r requirements.txt
+      - run: python pipeline.py tg-sync
+      - name: Доработка по комментариям (если есть)
+        run: python pipeline.py generate --rework-only && python pipeline.py tg-sync
+      - name: Сохранить
+        run: |
+          git config user.name "dzen-machine"; git config user.email "actions@github.com"
+          git add -A posts data kb inputs
+          git diff --cached --quiet || (git commit -m "Telegram: $(date -u +%FT%H:%M)" && git pull --rebase && git push)
