@@ -1,0 +1,39 @@
+# Каждое утро: (по понедельникам) отбор тем → написание статей → отправка в Telegram
+name: Daily production
+on:
+  schedule:
+    - cron: "0 4 * * *"          # 07:00 МСК
+  workflow_dispatch:
+    inputs:
+      score: { description: "Пересобрать темы", type: boolean, default: false }
+permissions: { contents: write }
+concurrency: { group: repo-writer, cancel-in-progress: false }
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -r requirements.txt
+      - name: Новые фото
+        run: python pipeline.py photos
+      - name: Выводы из статистики и отбор тем (понедельник или вручную)
+        run: |
+          if [ "$(date -u +%u)" = "1" ] || [ "${{ github.event.inputs.score }}" = "true" ]; then
+            python pipeline.py learn
+            python pipeline.py score
+          fi
+      - name: Написание
+        run: python pipeline.py generate
+      - name: Telegram
+        run: python pipeline.py tg-sync
+      - name: Сохранить
+        run: |
+          git config user.name "dzen-machine"; git config user.email "actions@github.com"
+          git add -A posts data photos/catalog.yaml kb inputs
+          git diff --cached --quiet || (git commit -m "Конвейер: $(date -u +%F)" && git pull --rebase && git push)
