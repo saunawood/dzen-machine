@@ -188,11 +188,27 @@ def handle_message(msg, state):
         send("✏️ Принято. Доработаю и пришлю снова.")
 
 
+def fetch_updates(offset: int):
+    """Входящие нажатия и сообщения.
+    Если настроен Cloudflare Worker (WORKER_URL) — берём их у него: при включённом вебхуке
+    Telegram не отдаёт обновления через getUpdates. Без Worker — по-старому, из Telegram."""
+    wurl, key = os.getenv("WORKER_URL"), os.getenv("WORKER_SECRET")
+    if not wurl:
+        return api("getUpdates", {"offset": offset, "timeout": 0})
+    req = urllib.request.Request(f"{wurl.rstrip('/')}/updates?offset={offset}",
+                                 headers={"X-Pull-Secret": key or "", "User-Agent": "dzen-machine"})
+    with urllib.request.urlopen(req, timeout=60) as r:
+        res = json.loads(r.read())
+    if not res.get("ok"):
+        raise RuntimeError(f"Worker: {res}")
+    return res["result"]
+
+
 def cmd_tg_sync(_args=None):
     _, chat = _token()
     state = load_json(STATE, {"offset": 0, "next_id": 1, "ids": {}, "msgs": {}, "reminded": []})
 
-    for upd in api("getUpdates", {"offset": state["offset"], "timeout": 0}):
+    for upd in fetch_updates(state["offset"]):
         state["offset"] = upd["update_id"] + 1
         try:
             if "callback_query" in upd:
