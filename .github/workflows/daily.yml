@@ -1,8 +1,5 @@
 # Каждое утро: (по понедельникам) отбор тем → написание статей → отправка в Telegram
 name: Daily production
-concurrency:
-  group: dzen-machine
-  cancel-in-progress: false
 on:
   schedule:
     - cron: "0 4 * * *"          # 07:00 МСК
@@ -37,6 +34,13 @@ jobs:
         run: python pipeline.py tg-sync
       - name: Сохранить
         run: |
-          git config user.name "dzen-machine"; git config user.email "actions@github.com"
-          git add -A posts data photos/catalog.yaml kb inputs
-          git diff --cached --quiet || (git commit -m "Конвейер: $(date -u +%F)" && git pull --rebase && git push)
+          git config user.name "dzen-machine"
+          git config user.email "actions@github.com"
+          git add -A
+          git commit -m "Конвейер: $(date +%F)" || exit 0
+          for i in 1 2 3; do
+            git pull --rebase -X theirs origin main && git push && exit 0
+            git rebase --abort || true
+            sleep 10
+          done
+          exit 1
