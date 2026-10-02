@@ -36,7 +36,7 @@ jobs:
         run: |
           git config user.name "dzen-machine"
           git config user.email "actions@github.com"
-          git add -A
+          git add -A posts data photos/catalog.yaml kb inputs
           git commit -m "Конвейер: $(date +%F)" || exit 0
           for i in 1 2 3; do
             git pull --rebase -X theirs origin main && git push && exit 0
