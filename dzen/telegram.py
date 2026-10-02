@@ -4,6 +4,7 @@ import html
 import json
 import os
 import uuid
+import urllib.error
 import urllib.request
 
 from .core import CFG, DRAFTS, INPUTS, KB, load_json, now, read_post, save_json, write_post
@@ -37,8 +38,16 @@ def api(method: str, fields=None, files=None):
         req = urllib.request.Request(url, body, {"Content-Type": f"multipart/form-data; boundary={boundary}"})
     else:
         req = urllib.request.Request(url, json.dumps(fields).encode(), {"Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=60) as r:
-        res = json.loads(r.read())
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            res = json.loads(r.read())
+    except urllib.error.HTTPError as e:
+        # Показываем, что именно не понравилось Telegram, а не просто «400 Bad Request»
+        try:
+            desc = json.loads(e.read()).get("description", "")
+        except Exception:
+            desc = ""
+        raise RuntimeError(f"Telegram {method}: {e.code} {desc}".strip()) from None
     if not res.get("ok"):
         raise RuntimeError(f"Telegram {method}: {res}")
     return res["result"]
@@ -133,7 +142,12 @@ def handle_callback(cq, state):
             meta["title"] = meta["title_variants"][int(parts[2])]
             write_post(path, meta, body)
             reply = f"Заголовок: {meta['title']}"
-    api("answerCallbackQuery", {"callback_query_id": cq["id"]})
+    # Бот приходит раз в 30 минут, и Telegram к этому времени считает нажатие «просроченным»
+    # и отвечает ошибкой 400. Это нормально для бота без сервера — просто пропускаем.
+    try:
+        api("answerCallbackQuery", {"callback_query_id": cq["id"]})
+    except Exception:
+        pass
     send(html.escape(reply))
 
 
