@@ -10,6 +10,19 @@ from .topics import mark_topic, next_topics
 
 # ───────── механические проверки (без модели) ─────────
 
+def length_limits():
+    """Из строки вида «6000–9000 знаков» достаёт (6000, 9000)."""
+    raw = str(CFG["generation"].get("length", "")).replace(" ", "").replace("\u00a0", "")
+    nums = [int(n) for n in re.findall(r"\d+", raw)]
+    return (nums[0], nums[-1]) if nums else (None, None)
+
+
+def text_length(body: str) -> int:
+    """Число знаков с пробелами, без меток фото."""
+    text = re.sub(PHOTO_RE, "", body)
+    return len(re.sub(r"\s+", " ", text).strip())
+
+
 def local_checks(body: str):
     issues, low = [], body.lower()
     for phrase in read_lines(KB / "stopwords.txt"):
@@ -33,18 +46,37 @@ def local_checks(body: str):
         if pid not in known:
             issues.append({"severity": "major", "type": "фото", "quote": f"[[photo:{pid}]]",
                            "fix": "такого фото нет в каталоге — заменить на фото из списка или убрать"})
+    # Точный подсчёт объёма: модели плохо считают знаки «на глаз»
+    lo, hi = length_limits()
+    if hi:
+        n = text_length(body)
+        if n > hi * 1.1:
+            issues.append({"severity": "major", "type": "объём", "quote": "",
+                           "fix": f"сейчас {n} знаков, нужно {lo}–{hi}. Сократить примерно на {n - hi} знаков: "
+                                  f"убрать повторы и общие слова, сжать второстепенные разделы, смысл сохранить"})
+        elif lo and n < lo * 0.8:
+            issues.append({"severity": "minor", "type": "объём", "quote": "",
+                           "fix": f"сейчас {n} знаков, нужно {lo}–{hi}. Добавить конкретики: примеры, цифры, решения"})
     return issues
 
 
 # ───────── этапы ─────────
+
+def blocking(review: dict):
+    return [i for i in review["issues"] if i.get("severity") in ("critical", "major")]
+
+
+def badness(review: dict) -> int:
+    """Чем больше, тем хуже: критическое замечание весит как 10 серьёзных."""
+    return sum(10 if i.get("severity") == "critical" else 1 for i in blocking(review))
+
 
 def critique(article: dict, brief: dict) -> dict:
     found = local_checks(article["body"])
     review = ask(prompt("critic", article=article, brief=brief, kb=kb_block(), local=found), role="critic")
     review.setdefault("issues", [])
     review["issues"] = found + review["issues"]
-    blocking = [i for i in review["issues"] if i.get("severity") in ("critical", "major")]
-    review["verdict"] = "revise" if blocking else "pass"
+    review["verdict"] = "revise" if blocking(review) else "pass"
     return review
 
 
@@ -55,16 +87,21 @@ def revise(article: dict, issues, brief: dict, photos, notes: str = "") -> dict:
 
 
 def improve_loop(article, brief, photos, log, notes=""):
+    """Критик → доработка по кругу. Всегда возвращает лучшую из версий, а не последнюю.
+    Ваши комментарии (notes) передаются в каждый круг, чтобы критик их не «откатил»."""
     review = critique(article, brief)
+    best_article, best_review = article, review
     rounds = 0
-    while review["verdict"] == "revise" and rounds < CFG["generation"]["max_revisions"]:
+    while best_review["verdict"] == "revise" and rounds < CFG["generation"]["max_revisions"]:
         rounds += 1
-        n = sum(1 for i in review["issues"] if i.get("severity") in ("critical", "major"))
-        log(f"  ↻ доработка {rounds}: серьёзных замечаний {n}")
-        article = revise(article, review["issues"], brief, photos, notes)
-        notes = ""
+        log(f"  ↻ доработка {rounds}: серьёзных замечаний {len(blocking(best_review))}")
+        article = revise(best_article, best_review["issues"], brief, photos, notes)
         review = critique(article, brief)
-    return article, review, rounds
+        if badness(review) <= badness(best_review):
+            best_article, best_review = article, review
+        else:
+            log(f"    ↩ версия хуже предыдущей ({len(blocking(review))} серьёзных) — продолжаю от лучшей")
+    return best_article, best_review, rounds
 
 
 def summarize(review, rounds) -> dict:
@@ -72,7 +109,7 @@ def summarize(review, rounds) -> dict:
     return {"verdict": review["verdict"], "rounds": rounds, "critical": sev("critical"),
             "major": sev("major"), "minor": sev("minor"), "summary": review.get("summary", ""),
             "open_issues": [f"[{i.get('severity')}] {i.get('type')}: {i.get('fix')}"
-                            for i in review["issues"] if i.get("severity") in ("critical", "major")][:8]}
+                            for i in blocking(review)][:8]}
 
 
 def produce(topic: dict, log=print):
@@ -85,9 +122,9 @@ def produce(topic: dict, log=print):
     draft = ask(prompt("write", brief=brief, kb=kb_block(), photos=photos or "(фото нет — не вставляй метки)",
                        length=CFG["generation"]["length"]))
     article = {"title": draft["title"], "body": draft["body"]}
-    log("  ✓ текст")
+    log(f"  ✓ текст ({text_length(article['body'])} знаков)")
     article, review, rounds = improve_loop(article, brief, photos, log)
-    log(f"  ✓ проверка: {review['verdict']}, кругов доработки {rounds}")
+    log(f"  ✓ проверка: {review['verdict']}, кругов доработки {rounds}, итог {text_length(article['body'])} знаков")
     edit = ask(prompt("editor", article=article, brief=brief))
     log("  ✓ заголовки и лид")
 
@@ -123,7 +160,7 @@ def rework(path, log=print):
     brief = meta.get("brief", {})
     photos = candidates(brief.get("photo_tags", []) + [meta.get("cluster", "")])
     article = revise({"title": meta["title"], "body": body}, [], brief, photos, notes)
-    article, review, rounds = improve_loop(article, brief, photos, log)
+    article, review, rounds = improve_loop(article, brief, photos, log, notes)
     meta["check"] = summarize(review, rounds)
     meta["notes_done"] = meta.get("notes_done", []) + meta.pop("notes", [])
     meta["status"] = "new"
