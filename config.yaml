@@ -5,10 +5,10 @@ channel:
   company: "Sauna-Wood"
   description: "Как спроектировать и построить сауну, хамам и SPA-зону в загородном доме без переделок. Для владельцев домов и тех, кто строится."
   language: ru
-  base_url: "https://saunawood.github.io/dzen-machine"       # или домен сайта компании
-  default_cover: "https://saunawood.github.io/dzen-machine/static/cover.jpg"
+  base_url: "https://blog.sauna-wood.ru"       # или домен сайта компании
+  default_cover: "https://blog.sauna-wood.ru/static/cover.jpg"
   # Куда вести читателя из статьи (UTM добавится автоматически). Пусто — без ссылки.
-  cta_url: "sauna-wood.ru"
+  cta_url: "https://sauna-wood.ru"
 
 models:
   default: "claude-sonnet-5-5"     # бриф, текст, правки, редактор
