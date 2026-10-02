@@ -1,7 +1,12 @@
 {
   "offset": 982210468,
-  "next_id": 1,
-  "ids": {},
-  "msgs": {},
+  "next_id": 2,
+  "ids": {
+    "1": "mozhno-li-sdelat-saunu-ili-hamam-v-podvale-tsokole-ili-garaz"
+  },
+  "msgs": {
+    "8": "mozhno-li-sdelat-saunu-ili-hamam-v-podvale-tsokole-ili-garaz",
+    "9": "mozhno-li-sdelat-saunu-ili-hamam-v-podvale-tsokole-ili-garaz"
+  },
   "reminded": []
 }
