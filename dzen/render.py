@@ -13,6 +13,42 @@ ALLOWED = {"p", "a", "b", "strong", "i", "em", "u", "s", "h2", "h3", "h4", "bloc
 PHOTO_RE = re.compile(r"\[\[photo:([a-z0-9_-]+)(?:\|([^\]]*))?\]\]")
 
 
+COMMENT_RE = re.compile(r"<!--.*?-->", re.S)
+TABLE_SEP_RE = re.compile(r"^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)*\|?\s*$")
+
+
+def _cells(line: str):
+    line = line.strip()
+    if line.startswith("|"):
+        line = line[1:]
+    if line.endswith("|"):
+        line = line[:-1]
+    return [c.strip() for c in line.split("|")]
+
+
+def tables_to_lists(body: str) -> str:
+    """Дзен не поддерживает таблицы, поэтому таблица Markdown превращается в блоки:
+    первая колонка — жирный подзаголовок, остальные — список «Колонка: значение»."""
+    lines = body.split("\n")
+    out, i = [], 0
+    while i < len(lines):
+        if (i + 1 < len(lines) and "|" in lines[i] and TABLE_SEP_RE.match(lines[i + 1])):
+            head = _cells(lines[i])
+            i += 2
+            blocks = []
+            while i < len(lines) and "|" in lines[i] and lines[i].strip():
+                row = _cells(lines[i])
+                title = row[0] if row else ""
+                items = [f"- **{h}:** {v}" for h, v in zip(head[1:], row[1:]) if v]
+                blocks.append(f"**{title}**\n\n" + "\n".join(items))
+                i += 1
+            out.append("\n\n" + "\n\n".join(blocks) + "\n\n")
+            continue
+        out.append(lines[i])
+        i += 1
+    return "\n".join(out)
+
+
 def photo_ids(body: str):
     return [m.group(1) for m in PHOTO_RE.finditer(body)]
 
@@ -37,6 +73,8 @@ def to_html(body: str, *, embed: bool = False) -> str:
         src = data_uri(pid) if embed else public_url(pid)
         return "\n\n" + (figure(src, caption) if src else "") + "\n\n"
 
+    body = COMMENT_RE.sub("", body)        # служебные пометки для редактора не публикуем
+    body = tables_to_lists(body)
     body = PHOTO_RE.sub(photo, body)
     out = markdown.markdown(body, extensions=["extra", "sane_lists"])
     out = re.sub(r"<p>\s*(<figure>.*?</figure>)\s*</p>", r"\1", out, flags=re.S)
