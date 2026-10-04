@@ -1,0 +1,32 @@
+# Каждое утро до основного запуска: забрать новые фото из папки Яндекс Диска в photos/
+name: Photos from Yandex Disk
+on:
+  schedule:
+    - cron: "30 3 * * *"          # 06:30 МСК — за полчаса до Daily production
+  workflow_dispatch:
+permissions: { contents: write }
+concurrency: { group: repo-writer, cancel-in-progress: false }
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      YADISK_PUBLIC_URL: ${{ secrets.YADISK_PUBLIC_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install pillow
+      - name: Скачать новые фото
+        run: python dzen/yadisk_sync.py
+      - name: Сохранить
+        run: |
+          git config user.name "dzen-machine"
+          git config user.email "actions@github.com"
+          git add -A photos data/yadisk.json
+          git commit -m "Фото с Яндекс Диска: $(date -u +%F)" || exit 0
+          for i in 1 2 3; do
+            git pull --rebase -X theirs origin main && git push && exit 0
+            git rebase --abort || true
+            sleep 10
+          done
+          exit 1
