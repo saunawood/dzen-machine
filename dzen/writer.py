@@ -60,6 +60,53 @@ def local_checks(body: str):
     return issues
 
 
+# ───────── обложка: не повторять недавние ─────────
+
+def recent_covers(exclude_slug: str = "", limit: int = 10):
+    """Обложки последних статей (черновики, расписание, опубликованные)."""
+    items = []
+    for path in DRAFTS.parent.rglob("*.md"):
+        if path.stem == exclude_slug:
+            continue
+        try:
+            meta = read_post(path)[0]
+        except Exception:
+            continue
+        if meta.get("cover"):
+            items.append((str(meta.get("created", "")), meta["cover"]))
+    items.sort(reverse=True)
+    return [c for _, c in items[:limit]]
+
+
+def choose_cover(used, exclude_slug: str = "") -> str:
+    """Первое фото статьи, которое не было обложкой в последних 10 статьях.
+    Если все фото статьи уже были обложками — берём самое давнее из них."""
+    if not used:
+        return ""
+    recent = recent_covers(exclude_slug)
+    for pid in used:
+        if pid not in recent:
+            return pid
+    return max(used, key=lambda pid: recent.index(pid) if pid in recent else -1)
+
+
+def fresh_first_photo(body: str, exclude_slug: str = "") -> str:
+    """Чтобы статьи не начинались с одного и того же снимка: если первое фото
+    уже было обложкой недавно, меняем его местами с более «свежим» фото этой же
+    статьи (метка переезжает вместе с подписью)."""
+    used = photo_ids(body)
+    if len(used) < 2:
+        return body
+    target = choose_cover(used, exclude_slug)
+    if target == used[0]:
+        return body
+    tags = list(re.finditer(PHOTO_RE, body))
+    if len(tags) != len(used):
+        return body                      # неожиданная разметка — ничего не трогаем
+    a, b = tags[0], tags[used.index(target)]
+    return (body[:a.start()] + b.group(0) + body[a.end():b.start()]
+            + a.group(0) + body[b.end():])
+
 # ───────── этапы ─────────
 
 def blocking(review: dict):
@@ -130,6 +177,7 @@ def produce(topic: dict, log=print):
 
     titles = [t for t in edit.get("titles", []) if t][:7] or [article["title"]]
     best = min(max(int(edit.get("best", 0)), 0), len(titles) - 1)
+    article["body"] = fresh_first_photo(article["body"])
     used = photo_ids(article["body"])
     slug = unique_slug(slugify(titles[best]))
     meta = {
@@ -165,6 +213,7 @@ def rework(path, log=print):
     meta["notes_done"] = meta.get("notes_done", []) + meta.pop("notes", [])
     meta["status"] = "new"
     meta.pop("tg", None)
+    article["body"] = fresh_first_photo(article["body"], exclude_slug=path.stem)
     used = photo_ids(article["body"])
     meta["cover"] = used[0] if used else ""
     write_post(path, meta, article["body"])
