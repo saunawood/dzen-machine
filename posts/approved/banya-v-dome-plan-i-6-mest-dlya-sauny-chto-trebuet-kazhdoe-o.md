@@ -13,7 +13,7 @@ topic: 'Где в доме разместить сауну или баню: 6 в
 cluster: сауна
 format: сравнение
 score: 79
-cover: 1-20
+cover: verhnee-dubrova-0045
 check:
   verdict: revise
   rounds: 4
