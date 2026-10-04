@@ -1,10 +1,11 @@
 {
   "offset": 982210502,
-  "next_id": 4,
+  "next_id": 5,
   "ids": {
     "1": "mozhno-li-sdelat-saunu-ili-hamam-v-podvale-tsokole-ili-garaz",
     "2": "banya-v-dome-plan-i-6-mest-dlya-sauny-chto-trebuet-kazhdoe-o",
-    "3": "10-voprosov-proektirovschiku-do-zalivki-chashi-basseyn-sauna"
+    "3": "10-voprosov-proektirovschiku-do-zalivki-chashi-basseyn-sauna",
+    "4": "chek-list-po-sloyam-chto-zalozhit-v-saunu-ili-hamam-do-otdel"
   },
   "msgs": {
     "8": "mozhno-li-sdelat-saunu-ili-hamam-v-podvale-tsokole-ili-garaz",
@@ -12,7 +13,9 @@
     "11": "banya-v-dome-plan-i-6-mest-dlya-sauny-chto-trebuet-kazhdoe-o",
     "12": "banya-v-dome-plan-i-6-mest-dlya-sauny-chto-trebuet-kazhdoe-o",
     "29": "10-voprosov-proektirovschiku-do-zalivki-chashi-basseyn-sauna",
-    "30": "10-voprosov-proektirovschiku-do-zalivki-chashi-basseyn-sauna"
+    "30": "10-voprosov-proektirovschiku-do-zalivki-chashi-basseyn-sauna",
+    "36": "chek-list-po-sloyam-chto-zalozhit-v-saunu-ili-hamam-do-otdel",
+    "37": "chek-list-po-sloyam-chto-zalozhit-v-saunu-ili-hamam-do-otdel"
   },
   "reminded": []
 }
