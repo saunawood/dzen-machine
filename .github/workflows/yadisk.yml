@@ -1,4 +1,5 @@
 # Каждое утро до основного запуска: забрать новые фото из папки Яндекс Диска в photos/
+# и сразу описать их (Claude смотрит на снимки и пишет описания в photos/catalog.yaml)
 name: Photos from Yandex Disk
 on:
   schedule:
@@ -11,13 +12,16 @@ jobs:
     runs-on: ubuntu-latest
     env:
       YADISK_PUBLIC_URL: ${{ secrets.YADISK_PUBLIC_URL }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
-      - run: pip install pillow
+      - run: pip install -r requirements.txt pillow
       - name: Скачать новые фото
         run: python dzen/yadisk_sync.py
+      - name: Описать новые фото
+        run: python pipeline.py photos
       - name: Сохранить
         run: |
           git config user.name "dzen-machine"
