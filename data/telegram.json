@@ -1,12 +1,13 @@
 {
   "offset": 982210504,
-  "next_id": 6,
+  "next_id": 7,
   "ids": {
     "1": "mozhno-li-sdelat-saunu-ili-hamam-v-podvale-tsokole-ili-garaz",
     "2": "banya-v-dome-plan-i-6-mest-dlya-sauny-chto-trebuet-kazhdoe-o",
     "3": "10-voprosov-proektirovschiku-do-zalivki-chashi-basseyn-sauna",
     "4": "chek-list-po-sloyam-chto-zalozhit-v-saunu-ili-hamam-do-otdel",
-    "5": "chek-list-po-sloyam-chto-zalozhit-v-saunu-ili-hamam-do-otdel"
+    "5": "chek-list-po-sloyam-chto-zalozhit-v-saunu-ili-hamam-do-otdel",
+    "6": "dva-kp-na-saunu-pod-klyuch-nelzya-sravnivat-po-summe-v-nih-r"
   },
   "msgs": {
     "8": "mozhno-li-sdelat-saunu-ili-hamam-v-podvale-tsokole-ili-garaz",
@@ -18,7 +19,9 @@
     "36": "chek-list-po-sloyam-chto-zalozhit-v-saunu-ili-hamam-do-otdel",
     "37": "chek-list-po-sloyam-chto-zalozhit-v-saunu-ili-hamam-do-otdel",
     "41": "chek-list-po-sloyam-chto-zalozhit-v-saunu-ili-hamam-do-otdel",
-    "42": "chek-list-po-sloyam-chto-zalozhit-v-saunu-ili-hamam-do-otdel"
+    "42": "chek-list-po-sloyam-chto-zalozhit-v-saunu-ili-hamam-do-otdel",
+    "46": "dva-kp-na-saunu-pod-klyuch-nelzya-sravnivat-po-summe-v-nih-r",
+    "47": "dva-kp-na-saunu-pod-klyuch-nelzya-sravnivat-po-summe-v-nih-r"
   },
   "reminded": [
     "banya-v-dome-plan-i-6-mest-dlya-sauny-chto-trebuet-kazhdoe-o:1"
