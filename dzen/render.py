@@ -8,8 +8,10 @@ import markdown
 from .core import CFG
 from .photos import data_uri, public_url
 
-ALLOWED = {"p", "a", "b", "strong", "i", "em", "u", "s", "h2", "h3", "h4", "blockquote",
-           "ul", "ol", "li", "figure", "img", "figcaption", "br"}
+# Только теги из требований Дзена к RSS (strong/em заменяются на b/i ниже)
+ALLOWED = {"p", "a", "b", "i", "u", "s", "h2", "h3", "h4", "blockquote",
+           "ul", "ol", "li", "figure", "img", "figcaption"}
+LI_RE = re.compile(r"<li>(.*?)</li>", re.S)
 PHOTO_RE = re.compile(r"\[\[photo:([a-z0-9_-]+)(?:\|([^\]]*))?\]\]")
 
 
@@ -39,7 +41,7 @@ def tables_to_lists(body: str) -> str:
             while i < len(lines) and "|" in lines[i] and lines[i].strip():
                 row = _cells(lines[i])
                 title = row[0] if row else ""
-                items = [f"- **{h}:** {v}" for h, v in zip(head[1:], row[1:]) if v]
+                items = [f"- {h}: {v}" for h, v in zip(head[1:], row[1:]) if v]
                 blocks.append(f"**{title}**\n\n" + "\n".join(items))
                 i += 1
             out.append("\n\n" + "\n\n".join(blocks) + "\n\n")
@@ -81,8 +83,13 @@ def to_html(body: str, *, embed: bool = False) -> str:
     out = re.sub(r'<p>\s*<img alt="([^"]*)" src="([^"]+)"\s*/?>\s*</p>',
                  lambda m: figure(m.group(2), m.group(1)), out)
     out = re.sub(r"<h1>(.*?)</h1>", r"<h2>\1</h2>", out)
+    out = re.sub(r"<(/?)strong>", r"<\1b>", out)          # Дзен понимает b, а не strong
+    out = re.sub(r"<(/?)em>", r"<\1i>", out)              # и i, а не em
+    out = re.sub(r"<br\s*/?>", " ", out)
     out = re.sub(r"</?([a-zA-Z0-9]+)[^>]*>",
                  lambda m: m.group(0) if m.group(1).lower() in ALLOWED else "", out)
+    # Внутри пунктов списка Дзен не поддерживает форматирование — оставляем только ссылки
+    out = LI_RE.sub(lambda m: "<li>" + re.sub(r"</?(?!a\b|/a\b)[a-zA-Z0-9]+[^>]*>", "", m.group(1)) + "</li>", out)
     return re.sub(r"\n{3,}", "\n\n", out).strip()
 
 
