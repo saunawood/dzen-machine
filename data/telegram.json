@@ -1,6 +1,6 @@
 {
   "offset": 982210512,
-  "next_id": 9,
+  "next_id": 10,
   "ids": {
     "1": "mozhno-li-sdelat-saunu-ili-hamam-v-podvale-tsokole-ili-garaz",
     "2": "banya-v-dome-plan-i-6-mest-dlya-sauny-chto-trebuet-kazhdoe-o",
@@ -9,7 +9,8 @@
     "5": "chek-list-po-sloyam-chto-zalozhit-v-saunu-ili-hamam-do-otdel",
     "6": "dva-kp-na-saunu-pod-klyuch-nelzya-sravnivat-po-summe-v-nih-r",
     "7": "hamam-ili-sauna-v-dome-chto-reshit-do-togo-kak-zakroyut-sten",
-    "8": "hamam-u-steny-sauny-kupel-nad-zhiloy-komnatoy-gde-lomaetsya"
+    "8": "hamam-u-steny-sauny-kupel-nad-zhiloy-komnatoy-gde-lomaetsya",
+    "9": "dva-dogovora-na-odnu-saunu-tseny-i-teksty-raznye-chto-sravni"
   },
   "msgs": {
     "8": "mozhno-li-sdelat-saunu-ili-hamam-v-podvale-tsokole-ili-garaz",
@@ -27,7 +28,9 @@
     "55": "hamam-ili-sauna-v-dome-chto-reshit-do-togo-kak-zakroyut-sten",
     "56": "hamam-ili-sauna-v-dome-chto-reshit-do-togo-kak-zakroyut-sten",
     "60": "hamam-u-steny-sauny-kupel-nad-zhiloy-komnatoy-gde-lomaetsya",
-    "61": "hamam-u-steny-sauny-kupel-nad-zhiloy-komnatoy-gde-lomaetsya"
+    "61": "hamam-u-steny-sauny-kupel-nad-zhiloy-komnatoy-gde-lomaetsya",
+    "72": "dva-dogovora-na-odnu-saunu-tseny-i-teksty-raznye-chto-sravni",
+    "73": "dva-dogovora-na-odnu-saunu-tseny-i-teksty-raznye-chto-sravni"
   },
   "reminded": [
     "banya-v-dome-plan-i-6-mest-dlya-sauny-chto-trebuet-kazhdoe-o:1",
