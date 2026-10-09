@@ -1,6 +1,6 @@
 {
   "offset": 982210512,
-  "next_id": 10,
+  "next_id": 11,
   "ids": {
     "1": "mozhno-li-sdelat-saunu-ili-hamam-v-podvale-tsokole-ili-garaz",
     "2": "banya-v-dome-plan-i-6-mest-dlya-sauny-chto-trebuet-kazhdoe-o",
@@ -10,7 +10,8 @@
     "6": "dva-kp-na-saunu-pod-klyuch-nelzya-sravnivat-po-summe-v-nih-r",
     "7": "hamam-ili-sauna-v-dome-chto-reshit-do-togo-kak-zakroyut-sten",
     "8": "hamam-u-steny-sauny-kupel-nad-zhiloy-komnatoy-gde-lomaetsya",
-    "9": "dva-dogovora-na-odnu-saunu-tseny-i-teksty-raznye-chto-sravni"
+    "9": "dva-dogovora-na-odnu-saunu-tseny-i-teksty-raznye-chto-sravni",
+    "10": "uspeem-li-sdelat-saunu-k-31-dekabrya-esli-nachat-v-oktyabre"
   },
   "msgs": {
     "8": "mozhno-li-sdelat-saunu-ili-hamam-v-podvale-tsokole-ili-garaz",
@@ -30,7 +31,9 @@
     "60": "hamam-u-steny-sauny-kupel-nad-zhiloy-komnatoy-gde-lomaetsya",
     "61": "hamam-u-steny-sauny-kupel-nad-zhiloy-komnatoy-gde-lomaetsya",
     "72": "dva-dogovora-na-odnu-saunu-tseny-i-teksty-raznye-chto-sravni",
-    "73": "dva-dogovora-na-odnu-saunu-tseny-i-teksty-raznye-chto-sravni"
+    "73": "dva-dogovora-na-odnu-saunu-tseny-i-teksty-raznye-chto-sravni",
+    "75": "uspeem-li-sdelat-saunu-k-31-dekabrya-esli-nachat-v-oktyabre",
+    "76": "uspeem-li-sdelat-saunu-k-31-dekabrya-esli-nachat-v-oktyabre"
   },
   "reminded": [
     "banya-v-dome-plan-i-6-mest-dlya-sauny-chto-trebuet-kazhdoe-o:1",
