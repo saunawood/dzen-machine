@@ -1,6 +1,6 @@
 {
   "offset": 982210514,
-  "next_id": 11,
+  "next_id": 12,
   "ids": {
     "1": "mozhno-li-sdelat-saunu-ili-hamam-v-podvale-tsokole-ili-garaz",
     "2": "banya-v-dome-plan-i-6-mest-dlya-sauny-chto-trebuet-kazhdoe-o",
@@ -11,7 +11,8 @@
     "7": "hamam-ili-sauna-v-dome-chto-reshit-do-togo-kak-zakroyut-sten",
     "8": "hamam-u-steny-sauny-kupel-nad-zhiloy-komnatoy-gde-lomaetsya",
     "9": "dva-dogovora-na-odnu-saunu-tseny-i-teksty-raznye-chto-sravni",
-    "10": "uspeem-li-sdelat-saunu-k-31-dekabrya-esli-nachat-v-oktyabre"
+    "10": "uspeem-li-sdelat-saunu-k-31-dekabrya-esli-nachat-v-oktyabre",
+    "11": "sauna-v-gostevom-dome-12-voprosov-do-zakupki-oborudovaniya"
   },
   "msgs": {
     "8": "mozhno-li-sdelat-saunu-ili-hamam-v-podvale-tsokole-ili-garaz",
@@ -33,7 +34,9 @@
     "72": "dva-dogovora-na-odnu-saunu-tseny-i-teksty-raznye-chto-sravni",
     "73": "dva-dogovora-na-odnu-saunu-tseny-i-teksty-raznye-chto-sravni",
     "75": "uspeem-li-sdelat-saunu-k-31-dekabrya-esli-nachat-v-oktyabre",
-    "76": "uspeem-li-sdelat-saunu-k-31-dekabrya-esli-nachat-v-oktyabre"
+    "76": "uspeem-li-sdelat-saunu-k-31-dekabrya-esli-nachat-v-oktyabre",
+    "83": "sauna-v-gostevom-dome-12-voprosov-do-zakupki-oborudovaniya",
+    "84": "sauna-v-gostevom-dome-12-voprosov-do-zakupki-oborudovaniya"
   },
   "reminded": [
     "banya-v-dome-plan-i-6-mest-dlya-sauny-chto-trebuet-kazhdoe-o:1",
