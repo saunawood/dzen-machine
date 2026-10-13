@@ -1,6 +1,6 @@
 {
   "offset": 982210522,
-  "next_id": 12,
+  "next_id": 13,
   "ids": {
     "1": "mozhno-li-sdelat-saunu-ili-hamam-v-podvale-tsokole-ili-garaz",
     "2": "banya-v-dome-plan-i-6-mest-dlya-sauny-chto-trebuet-kazhdoe-o",
@@ -12,7 +12,8 @@
     "8": "hamam-u-steny-sauny-kupel-nad-zhiloy-komnatoy-gde-lomaetsya",
     "9": "dva-dogovora-na-odnu-saunu-tseny-i-teksty-raznye-chto-sravni",
     "10": "uspeem-li-sdelat-saunu-k-31-dekabrya-esli-nachat-v-oktyabre",
-    "11": "sauna-v-gostevom-dome-12-voprosov-do-zakupki-oborudovaniya"
+    "11": "sauna-v-gostevom-dome-12-voprosov-do-zakupki-oborudovaniya",
+    "12": "chek-list-priemki-sauny-i-hamama-chto-smotret-i-chto-pisat-v"
   },
   "msgs": {
     "8": "mozhno-li-sdelat-saunu-ili-hamam-v-podvale-tsokole-ili-garaz",
@@ -36,7 +37,9 @@
     "75": "uspeem-li-sdelat-saunu-k-31-dekabrya-esli-nachat-v-oktyabre",
     "76": "uspeem-li-sdelat-saunu-k-31-dekabrya-esli-nachat-v-oktyabre",
     "83": "sauna-v-gostevom-dome-12-voprosov-do-zakupki-oborudovaniya",
-    "84": "sauna-v-gostevom-dome-12-voprosov-do-zakupki-oborudovaniya"
+    "84": "sauna-v-gostevom-dome-12-voprosov-do-zakupki-oborudovaniya",
+    "104": "chek-list-priemki-sauny-i-hamama-chto-smotret-i-chto-pisat-v",
+    "105": "chek-list-priemki-sauny-i-hamama-chto-smotret-i-chto-pisat-v"
   },
   "reminded": [
     "banya-v-dome-plan-i-6-mest-dlya-sauny-chto-trebuet-kazhdoe-o:1",
