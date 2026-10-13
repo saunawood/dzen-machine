@@ -5,6 +5,7 @@ import json
 import os
 import re
 import sys
+import time
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -157,6 +158,54 @@ def extract_json(text: str):
 _client = None
 
 
+def _use_batch() -> bool:
+    """Batch API (−50% к цене) — для утреннего конвейера. Ответы на кнопки и комментарии
+    в Telegram идут обычными запросами, чтобы не ждать. CLAUDE_SYNC=1 отключает пакеты."""
+    if os.getenv("CLAUDE_SYNC") or not CFG["models"].get("batch"):
+        return False
+    return os.getenv("GITHUB_WORKFLOW", "") != "Telegram sync"
+
+
+def _batch_call(model: str, messages: list):
+    """Один запрос через Batch API. Если пакет не готов за batch_timeout_min — отменяем
+    и возвращаем None (тогда делаем обычный запрос)."""
+    timeout = float(CFG["models"].get("batch_timeout_min", 30)) * 60
+    req = {"custom_id": "dzen", "params": {"model": model, "max_tokens": CFG["models"]["max_tokens"],
+                                           "messages": messages}}
+    batch = _client.messages.batches.create(requests=[req])
+    started, pause = time.time(), 10
+    print(f"    ⏳ пакетный запрос {batch.id} (−50%), ждём ответ…", flush=True)
+    while batch.processing_status != "ended":
+        if time.time() - started > timeout:
+            print(f"    ⌛ пакет не готов за {timeout / 60:.0f} мин — отменяю и делаю обычный запрос", flush=True)
+            try:
+                _client.messages.batches.cancel(batch.id)
+            except Exception:
+                pass
+            return None
+        time.sleep(pause)
+        pause = min(pause * 1.5, 60)
+        batch = _client.messages.batches.retrieve(batch.id)
+    for item in _client.messages.batches.results(batch.id):
+        if item.result.type == "succeeded":
+            print(f"    ✓ пакет готов за {(time.time() - started) / 60:.1f} мин", flush=True)
+            return item.result.message
+        err = getattr(item.result, "error", None)
+        print(f"    ✗ пакет: {item.result.type} {err or ''} — делаю обычный запрос", flush=True)
+    return None
+
+
+def _call(model: str, messages: list):
+    if _use_batch():
+        try:
+            msg = _batch_call(model, messages)
+            if msg is not None:
+                return msg
+        except Exception as e:
+            print(f"    ✗ Batch API недоступен ({e}) — делаю обычный запрос", flush=True)
+    return _client.messages.create(model=model, max_tokens=CFG["models"]["max_tokens"], messages=messages)
+
+
 def ask(text: str, *, role: str = "default", images=None, as_json: bool = True):
     """Один вызов Claude. images — список (bytes, media_type)."""
     global _client
@@ -171,11 +220,11 @@ def ask(text: str, *, role: str = "default", images=None, as_json: bool = True):
                                             "data": base64.b64encode(b).decode()}}
                for b, mt in (images or [])]
     content.append({"type": "text", "text": text})
+    messages = [{"role": "user", "content": content}]
 
     last_err = None
     for _ in range(2):  # повтор, если модель сломала JSON
-        resp = _client.messages.create(model=model, max_tokens=CFG["models"]["max_tokens"],
-                                       messages=[{"role": "user", "content": content}])
+        resp = _call(model, messages)
         out = "".join(b.text for b in resp.content if b.type == "text")
         if not as_json:
             return out
